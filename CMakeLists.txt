@@ -15,6 +15,13 @@ set(IMGUI_SOURCES
     lib/imgui/imgui_impl_opengl3.cpp
 )
 
-add_executable(MotionGraphicsEditor src/main.cpp ${IMGUI_SOURCES})
+set(APP_SOURCES
+    src/main.cpp
+    src/app_window.cpp
+    src/top_panel.cpp
+    src/bottom_panel.cpp
+)
+
+add_executable(MotionGraphicsEditor ${APP_SOURCES} ${IMGUI_SOURCES})
 
 target_link_libraries(MotionGraphicsEditor ${CMAKE_CURRENT_SOURCE_DIR}/lib/glfw/lib-vc2010-64/glfw3.lib opengl32.lib)
