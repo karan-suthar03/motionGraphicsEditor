@@ -81,20 +81,20 @@ static void RenderProjectSettingsModal(MGE::Project& project) {
     ImGui::SeparatorText("Timeline");
 
     
-    float fpsF = (float)tl.GetFPS();
+    float fpsF = (float)tl.getFPS();
     ImGui::SetNextItemWidth(120);
     if (ImGui::DragFloat("FPS", &fpsF, 1.0f, 1.0f, 240.0f, "%.0f"))
-        tl.SetFPS((double)fpsF);
+        tl.setFPS((double)fpsF);
 
     
-    float startF = (float)tl.GetStartTime();
-    float endF   = (float)tl.GetEndTime();
+    float startF = (float)tl.getStartTime();
+    float endF   = (float)tl.getEndTime();
     ImGui::SetNextItemWidth(120);
-    if (ImGui::DragFloat("Start (s)", &startF, 0.1f, 0.0f, (float)(tl.GetEndTime() - 0.1)))
-        tl.SetStartTime((double)startF);
+    if (ImGui::DragFloat("Start (s)", &startF, 0.1f, 0.0f, (float)(tl.getEndTime() - 0.1)))
+        tl.setStartTime((double)startF);
     ImGui::SetNextItemWidth(120);
-    if (ImGui::DragFloat("End (s)",   &endF,   0.1f, (float)(tl.GetStartTime() + 0.1), 3600.0f))
-        tl.SetEndTime((double)endF);
+    if (ImGui::DragFloat("End (s)",   &endF,   0.1f, (float)(tl.getStartTime() + 0.1), 3600.0f))
+        tl.setEndTime((double)endF);
 
     ImGui::Spacing();
     ImGui::Separator();

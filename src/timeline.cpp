@@ -19,24 +19,24 @@ Timeline::Timeline()
 
 
 
-int Timeline::GetTotalFrames() const {
-    return static_cast<int>(std::floor(GetDuration() * m_fps));
+int Timeline::getTotalFrames() const {
+    return static_cast<int>(std::floor(getDuration() * m_fps));
 }
 
-int Timeline::GetCurrentFrame() const {
+int Timeline::getCurrentFrame() const {
     return static_cast<int>(std::floor(m_currentTime * m_fps));
 }
 
 
 
 
-void Timeline::SetCurrentTime(double t) {
+void Timeline::setCurrentTime(double t) {
     if (t < m_startTime) t = m_startTime;
     if (t > m_endTime)   t = m_endTime;
     m_currentTime = t;
 }
 
-void Timeline::SetStartTime(double t) {
+void Timeline::setStartTime(double t) {
     if (t >= m_endTime)
         throw std::invalid_argument("Timeline: start time must be less than end time.");
     m_startTime = t;
@@ -45,7 +45,7 @@ void Timeline::SetStartTime(double t) {
         m_currentTime = m_startTime;
 }
 
-void Timeline::SetEndTime(double t) {
+void Timeline::setEndTime(double t) {
     if (t <= m_startTime)
         throw std::invalid_argument("Timeline: end time must be greater than start time.");
     m_endTime = t;
@@ -54,7 +54,7 @@ void Timeline::SetEndTime(double t) {
         m_currentTime = m_endTime;
 }
 
-void Timeline::SetFPS(double fps) {
+void Timeline::setFPS(double fps) {
     if (fps <= 0.0)
         throw std::invalid_argument("Timeline: FPS must be a positive value.");
     m_fps = fps;
@@ -63,20 +63,20 @@ void Timeline::SetFPS(double fps) {
 
 
 
-void Timeline::Play() {
+void Timeline::play() {
     m_playbackState = PlaybackState::Playing;
 }
 
-void Timeline::Pause() {
+void Timeline::pause() {
     m_playbackState = PlaybackState::Paused;
 }
 
-void Timeline::Scrub(double t) {
+void Timeline::scrub(double t) {
     m_playbackState = PlaybackState::Scrubbing;
-    SetCurrentTime(t);
+    setCurrentTime(t);
 }
 
-void Timeline::StopScrubbing() {
+void Timeline::stopScrubbing() {
     if (m_playbackState == PlaybackState::Scrubbing)
         m_playbackState = PlaybackState::Paused;
 }

@@ -1,9 +1,20 @@
 #pragma once
 
+#include <vector>
+#include <string>
+
 namespace MGE {
 
+    struct Layer {
+        std::string name;
+        bool visible;
+        double startTime;
+        double duration;
 
-
+        Layer(const std::string& n, double start, double duration)
+            : name(n), visible(true), startTime(start), duration(duration) {
+        }
+    };
 
 enum class PlaybackState {
     Paused,
@@ -11,65 +22,58 @@ enum class PlaybackState {
     Scrubbing
 };
 
-
-
-
-
-
-
-
-
 class Timeline {
 public:
     
     Timeline();
 
     
-    double        GetCurrentTime()   const { return m_currentTime; }
-    double        GetStartTime()     const { return m_startTime; }
-    double        GetEndTime()       const { return m_endTime; }
-    double        GetFPS()           const { return m_fps; }
-    PlaybackState GetPlaybackState() const { return m_playbackState; }
+    double        getCurrentTime()   const { return m_currentTime; }
+    double        getStartTime()     const { return m_startTime; }
+    double        getEndTime()       const { return m_endTime; }
+    double        getFPS()           const { return m_fps; }
+    PlaybackState getPlaybackState() const { return m_playbackState; }
 
     
-    double GetDuration()         const { return m_endTime - m_startTime; }
-    int    GetTotalFrames()      const;   
-    int    GetCurrentFrame()     const;   
+    double getDuration()         const { return m_endTime - m_startTime; }
+    int    getTotalFrames()      const;
+    int    getCurrentFrame()     const;
 
-    
-    bool IsPlaying()   const { return m_playbackState == PlaybackState::Playing;   }
-    bool IsPaused()    const { return m_playbackState == PlaybackState::Paused;    }
-    bool IsScrubbing() const { return m_playbackState == PlaybackState::Scrubbing; }
 
+    bool isPlaying()   const { return m_playbackState == PlaybackState::Playing;   }
+    bool isPaused()    const { return m_playbackState == PlaybackState::Paused;    }
+    bool isScrubbing() const { return m_playbackState == PlaybackState::Scrubbing; }
     
+    void setCurrentTime(double t);
     
-    void SetCurrentTime(double t);
+    void setStartTime(double t);
+    void setEndTime(double t);
+    
+    void setFPS(double fps);
+    
+    void play();
+    
+    void pause();
+    
+    void scrub(double t);
+    
+    void stopScrubbing();
 
-    
-    void SetStartTime(double t);
-    void SetEndTime(double t);
+    void addLayer(const Layer& layer) {
+        m_layers.push_back(layer);
+    }
 
-    
-    void SetFPS(double fps);
-
-    
-    void Play();
-
-    
-    void Pause();
-
-    
-    void Scrub(double t);
-
-    
-    void StopScrubbing();
+    const std::vector<Layer>& getLayers() const {
+        return m_layers;
+    }
 
 private:
     double        m_currentTime;
     double        m_startTime;
     double        m_endTime;
     double        m_fps;
+	std::vector<Layer> m_layers;
     PlaybackState m_playbackState;
 };
 
-} 
+} // namespace MGE

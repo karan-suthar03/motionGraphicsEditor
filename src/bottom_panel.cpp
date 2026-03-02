@@ -22,8 +22,6 @@ namespace BottomPanel {
         {"Audio 02",   IM_COL32(220,  80, 100, 255)}
     };
 
-    static const int layerCount = sizeof(tracks) / sizeof(tracks[0]);
-
     
     static const float rowHeight = 34.0f;
     static const float headerHeight = 28.0f;
@@ -33,8 +31,7 @@ namespace BottomPanel {
     static bool leftPaneScrolled = false;
     static bool playheadDragging = false;
 
-    
-    static float projectDuration = 60.0f; 
+    static float projectDuration = 60.0f;
     static float visibleStart = 0.0f;
     static float visibleEnd = 10.0f;
     static int zoomDragState = 0;
@@ -43,9 +40,9 @@ namespace BottomPanel {
         MGE::Timeline& timeline = project.GetTimeline();
 
         
-        projectDuration = (float)timeline.GetDuration();
+        projectDuration = (float)timeline.getDuration();
         if (projectDuration < 1.0f) projectDuration = 1.0f;
-        float playheadTime = (float)timeline.GetCurrentTime();
+        float playheadTime = (float)timeline.getCurrentTime();
 
         
         if (visibleEnd > projectDuration) visibleEnd = projectDuration;
@@ -123,7 +120,7 @@ namespace BottomPanel {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
         ImVec2 bgPos = ImGui::GetCursorScreenPos();
-        float totalHeight = layerCount * rowHeight;
+        float totalHeight = (int)timeline.getLayers().size() * rowHeight;
 
         
         for (float t = startTick; t <= visibleEnd; t += step) {
@@ -133,7 +130,8 @@ namespace BottomPanel {
             }
         }
 
-        for (int i = 0; i < layerCount; i++) {
+        const auto& layers = timeline.getLayers();
+        for (int i = 0; i < (int)layers.size(); i++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
             ImU32 bgCol = (i % 2 == 0) ? colTrackEven : colTrackOdd;
@@ -141,8 +139,8 @@ namespace BottomPanel {
             rightDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + rightWidth, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
 
             
-            float clipStart = 1.0f + (i * 0.5f);
-            float clipEnd = clipStart + 2.5f;
+			float clipStart = layers[i].startTime;
+            float clipEnd = layers[i].startTime + layers[i].duration;
 
             float x0 = cursorP.x + ((clipStart - visibleStart) / duration) * rightWidth;
             float x1 = cursorP.x + ((clipEnd - visibleStart) / duration) * rightWidth;
@@ -153,7 +151,7 @@ namespace BottomPanel {
                 float drawX0 = (x0 < cursorP.x) ? cursorP.x : x0;
                 float drawX1 = (x1 > cursorP.x + rightWidth) ? cursorP.x + rightWidth : x1;
 
-                ImU32 colBase = tracks[i].color;
+                ImU32 colBase = IM_COL32(255, 20, 20, 255);
                 ImVec4 colV = ImGui::ColorConvertU32ToFloat4(colBase);
                 ImU32 colDark = ImGui::ColorConvertFloat4ToU32(ImVec4(colV.x * 0.7f, colV.y * 0.7f, colV.z * 0.7f, 1.0f));
 
@@ -281,7 +279,7 @@ namespace BottomPanel {
             float wheel = ImGui::GetIO().MouseWheel;
             if (wheel != 0.0f) {
                 float clipsViewHeight = panelSize.y - headerHeight - scrollbarHeight;
-                float maxScroll = layerCount * rowHeight - clipsViewHeight;
+                float maxScroll = layers.size() * rowHeight - clipsViewHeight;
                 if (maxScroll < 0.0f) maxScroll = 0.0f;
                 sharedScrollY -= wheel * rowHeight;
                 if (sharedScrollY < 0.0f) sharedScrollY = 0.0f;
@@ -303,10 +301,8 @@ namespace BottomPanel {
             const float btnW = 52.0f;
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
-            if (timeline.IsPlaying()) {
-                if (ImGui::SmallButton(" Pause ")) timeline.Pause();
-            } else {
-                if (ImGui::SmallButton(" Play  ")) timeline.Play();
+            if (ImGui::SmallButton("+ Layer")) {
+                timeline.addLayer(MGE::Layer("Shape Layer", 0.0, timeline.getDuration()));
             }
             ImGui::PopStyleVar();
         }
@@ -320,15 +316,15 @@ namespace BottomPanel {
         ImDrawList* leftDraw = ImGui::GetWindowDrawList();
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-        for (int i = 0; i < layerCount; i++) {
+        for (int i = 0; i < (int)layers.size(); i++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
             ImU32 bgCol = (i % 2 == 0) ? colTrackEven : colTrackOdd;
             leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), bgCol);
 
-            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), tracks[i].color);
+            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), IM_COL32(255, 20, 20, 255));
             leftDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
-            leftDraw->AddText(ImVec2(cursorP.x + 15, cursorP.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f), IM_COL32(220, 220, 220, 255), tracks[i].name);
+            leftDraw->AddText(ImVec2(cursorP.x + 15, cursorP.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f), IM_COL32(220, 220, 220, 255), layers[i].name.c_str());
 
             ImGui::Dummy(ImVec2(0.0f, rowHeight));
         }
@@ -362,12 +358,6 @@ namespace BottomPanel {
 
         if (ImGui::IsItemHovered()) ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
         if (ImGui::IsItemActive()) splitX += ImGui::GetIO().MouseDelta.x;
-
-
-        
-        
-        
-
         
         float phX = rightPaneScreenPos.x + ((playheadTime - visibleStart) / duration) * rightWidth;
         float phYTop = rightPaneScreenPos.y;
@@ -392,7 +382,7 @@ namespace BottomPanel {
                 if (newTime > projectDuration) newTime = projectDuration;
                 playheadTime = newTime;
                 
-                timeline.Scrub(newTime);
+                timeline.scrub(newTime);
                 phX = rightPaneScreenPos.x + ((playheadTime - visibleStart) / duration) * rightWidth;
                 ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
             } else {
