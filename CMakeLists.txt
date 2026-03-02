@@ -20,6 +20,8 @@ set(APP_SOURCES
     src/app_window.cpp
     src/top_panel.cpp
     src/bottom_panel.cpp
+    src/project.cpp
+    src/timeline.cpp
 )
 
 add_executable(MotionGraphicsEditor ${APP_SOURCES} ${IMGUI_SOURCES})

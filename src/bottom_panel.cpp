@@ -1,4 +1,5 @@
 #include "bottom_panel.h"
+#include "project.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <cmath>
@@ -30,16 +31,25 @@ namespace BottomPanel {
 
     static float sharedScrollY = 0.0f;
     static bool leftPaneScrolled = false;
-    static float playheadTime = 2.4f;
     static bool playheadDragging = false;
 
     
     static float projectDuration = 60.0f; 
     static float visibleStart = 0.0f;
     static float visibleEnd = 10.0f;
-    static int zoomDragState = 0; 
+    static int zoomDragState = 0;
 
-    void Render() {
+    void Render(MGE::Project& project) {
+        MGE::Timeline& timeline = project.GetTimeline();
+
+        
+        projectDuration = (float)timeline.GetDuration();
+        if (projectDuration < 1.0f) projectDuration = 1.0f;
+        float playheadTime = (float)timeline.GetCurrentTime();
+
+        
+        if (visibleEnd > projectDuration) visibleEnd = projectDuration;
+        if (visibleStart >= visibleEnd) visibleStart = 0.0f;
         ImGui::PushStyleVar(ImGuiStyleVar_WindowPadding, ImVec2(0, 0));
         ImGui::BeginChild("BottomPanel", ImVec2(0, 0), false);
         ImGui::PopStyleVar();
@@ -287,7 +297,20 @@ namespace BottomPanel {
 
         leftHeaderDraw->AddRectFilled(leftHeaderPos, ImVec2(leftHeaderPos.x + splitX, leftHeaderPos.y + headerHeight), colHeaderBg);
         leftHeaderDraw->AddText(ImVec2(leftHeaderPos.x + 10, leftHeaderPos.y + 6), IM_COL32(180, 180, 180, 255), "Tracks");
-        ImGui::EndChild();
+
+        
+        {
+            const float btnW = 52.0f;
+            ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
+            ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
+            if (timeline.IsPlaying()) {
+                if (ImGui::SmallButton(" Pause ")) timeline.Pause();
+            } else {
+                if (ImGui::SmallButton(" Play  ")) timeline.Play();
+            }
+            ImGui::PopStyleVar();
+        }
+        ImGui::EndChild(); 
 
         
         ImGui::SetNextWindowScroll(ImVec2(0.0f, sharedScrollY));
@@ -369,6 +392,7 @@ namespace BottomPanel {
                 if (newTime > projectDuration) newTime = projectDuration;
                 playheadTime = newTime;
                 
+                timeline.Scrub(newTime);
                 phX = rightPaneScreenPos.x + ((playheadTime - visibleStart) / duration) * rightWidth;
                 ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
             } else {

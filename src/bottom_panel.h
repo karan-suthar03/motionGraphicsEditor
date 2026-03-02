@@ -1,5 +1,6 @@
 #pragma once
+#include "project.h"
 
 namespace BottomPanel {
-    void Render();
+    void Render(MGE::Project& project);
 }
