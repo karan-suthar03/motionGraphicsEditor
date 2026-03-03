@@ -25,6 +25,7 @@ namespace BottomPanel {
 
     void Render(MGE::Project& project) {
         MGE::Timeline& timeline = project.GetTimeline();
+        MGE::Scene&    scene    = project.GetScene();
 
         
         projectDuration = (float)timeline.getDuration();
@@ -108,7 +109,7 @@ namespace BottomPanel {
 
         ImVec2 bgPos = ImGui::GetCursorScreenPos();
 
-        const auto& layers = timeline.getLayers();
+        const auto& layers = scene.getLayers();
         float totalHeight = (int)layers.size() * rowHeight;
 
         for (float t = startTick; t <= visibleEnd; t += step) {
@@ -289,7 +290,7 @@ namespace BottomPanel {
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
             if (ImGui::SmallButton("+ Layer")) {
-                timeline.addLayer(std::make_unique<MGE::Layer>("Shape layer", (double)playheadTime, 1.0));
+                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", (double)playheadTime, 1.0));
             }
             ImGui::PopStyleVar();
         }

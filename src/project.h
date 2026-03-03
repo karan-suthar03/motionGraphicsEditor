@@ -1,6 +1,7 @@
 #pragma once
 
 #include "timeline.h"
+#include "scene.h"
 #include <string>
 
 namespace MGE {
@@ -65,12 +66,16 @@ public:
     Timeline&       GetTimeline()       { return m_timeline; }
     const Timeline& GetTimeline() const { return m_timeline; }
 
+    Scene&          GetScene()          { return m_scene; }
+    const Scene&    GetScene()    const { return m_scene; }
+
 private:
     std::string     m_id;
     std::string     m_name;
     int             m_version;
     ProjectMetadata m_metadata;
     Timeline        m_timeline;
+    Scene           m_scene;
 
     
     static std::string GenerateID();

@@ -1,9 +1,5 @@
 #pragma once
 
-#include "layer.h"
-#include <vector>
-#include <memory>
-
 namespace MGE {
 
 enum class PlaybackState {
@@ -49,20 +45,11 @@ public:
     
     void stopScrubbing();
 
-    void addLayer(std::unique_ptr<Layer> layer) {
-        m_layers.push_back(std::move(layer));
-    }
-
-    const std::vector<std::unique_ptr<Layer>>& getLayers() const {
-        return m_layers;
-    }
-
 private:
     double        m_currentTime;
     double        m_startTime;
     double        m_endTime;
     double        m_fps;
-    std::vector<std::unique_ptr<Layer>> m_layers;
     PlaybackState m_playbackState;
 };
 
