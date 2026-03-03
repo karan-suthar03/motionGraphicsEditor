@@ -1,20 +1,10 @@
 #pragma once
 
+#include "layer.h"
 #include <vector>
-#include <string>
+#include <memory>
 
 namespace MGE {
-
-    struct Layer {
-        std::string name;
-        bool visible;
-        double startTime;
-        double duration;
-
-        Layer(const std::string& n, double start, double duration)
-            : name(n), visible(true), startTime(start), duration(duration) {
-        }
-    };
 
 enum class PlaybackState {
     Paused,
@@ -59,11 +49,11 @@ public:
     
     void stopScrubbing();
 
-    void addLayer(const Layer& layer) {
-        m_layers.push_back(layer);
+    void addLayer(std::unique_ptr<Layer> layer) {
+        m_layers.push_back(std::move(layer));
     }
 
-    const std::vector<Layer>& getLayers() const {
+    const std::vector<std::unique_ptr<Layer>>& getLayers() const {
         return m_layers;
     }
 
@@ -72,7 +62,7 @@ private:
     double        m_startTime;
     double        m_endTime;
     double        m_fps;
-	std::vector<Layer> m_layers;
+    std::vector<std::unique_ptr<Layer>> m_layers;
     PlaybackState m_playbackState;
 };
 

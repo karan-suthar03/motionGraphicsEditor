@@ -1,27 +1,14 @@
 #include "bottom_panel.h"
 #include "project.h"
+#include "layer.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <cmath>
+#include <memory>
 
 namespace BottomPanel {
     static float splitX = 250.0f;
     static const float dividerWidth = 6.0f;
-
-    struct TrackDef {
-        const char* name;
-        ImU32 color;
-    };
-
-    static const TrackDef tracks[] = {
-        {"Video 02",   IM_COL32(190, 100, 220, 255)},
-        {"Video 01",   IM_COL32(100, 180, 255, 255)},
-        {"Text",       IM_COL32(230, 160,  50, 255)},
-        {"Effects",    IM_COL32(70, 210, 150, 255)},
-        {"Audio 01",   IM_COL32(220,  80, 100, 255)},
-        {"Audio 02",   IM_COL32(220,  80, 100, 255)}
-    };
-
     
     static const float rowHeight = 34.0f;
     static const float headerHeight = 28.0f;
@@ -120,9 +107,10 @@ namespace BottomPanel {
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
         ImVec2 bgPos = ImGui::GetCursorScreenPos();
-        float totalHeight = (int)timeline.getLayers().size() * rowHeight;
 
-        
+        const auto& layers = timeline.getLayers();
+        float totalHeight = (int)layers.size() * rowHeight;
+
         for (float t = startTick; t <= visibleEnd; t += step) {
             float x = bgPos.x + ((t - visibleStart) / duration) * rightWidth;
             if (x >= bgPos.x && x <= bgPos.x + rightWidth) {
@@ -130,7 +118,6 @@ namespace BottomPanel {
             }
         }
 
-        const auto& layers = timeline.getLayers();
         for (int i = 0; i < (int)layers.size(); i++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
@@ -139,8 +126,8 @@ namespace BottomPanel {
             rightDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + rightWidth, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
 
             
-			float clipStart = layers[i].startTime;
-            float clipEnd = layers[i].startTime + layers[i].duration;
+            float clipStart = (float)layers[i]->getStartTime();
+            float clipEnd   = (float)(layers[i]->getStartTime() + layers[i]->getDuration());
 
             float x0 = cursorP.x + ((clipStart - visibleStart) / duration) * rightWidth;
             float x1 = cursorP.x + ((clipEnd - visibleStart) / duration) * rightWidth;
@@ -302,7 +289,7 @@ namespace BottomPanel {
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
             if (ImGui::SmallButton("+ Layer")) {
-                timeline.addLayer(MGE::Layer("Shape Layer", 0.0, timeline.getDuration()));
+                timeline.addLayer(std::make_unique<MGE::Layer>("Shape layer", (double)playheadTime, 1.0));
             }
             ImGui::PopStyleVar();
         }
@@ -322,9 +309,9 @@ namespace BottomPanel {
             ImU32 bgCol = (i % 2 == 0) ? colTrackEven : colTrackOdd;
             leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), bgCol);
 
-            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), IM_COL32(255, 20, 20, 255));
+            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), IM_COL32(100, 180, 255, 255));
             leftDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
-            leftDraw->AddText(ImVec2(cursorP.x + 15, cursorP.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f), IM_COL32(220, 220, 220, 255), layers[i].name.c_str());
+            leftDraw->AddText(ImVec2(cursorP.x + 15, cursorP.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f), IM_COL32(220, 220, 220, 255), layers[i]->getName().c_str());
 
             ImGui::Dummy(ImVec2(0.0f, rowHeight));
         }
