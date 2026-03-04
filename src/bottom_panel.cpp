@@ -119,10 +119,10 @@ namespace BottomPanel {
             }
         }
 
-        for (int i = 0; i < (int)layers.size(); i++) {
+        for (int i = (int)layers.size() - 1, row = 0; i >= 0; i--, row++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
-            ImU32 bgCol = (i % 2 == 0) ? colTrackEven : colTrackOdd;
+            ImU32 bgCol = (row % 2 == 0) ? colTrackEven : colTrackOdd;
             rightDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + rightWidth, cursorP.y + rowHeight), bgCol);
             rightDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + rightWidth, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
 
@@ -290,7 +290,7 @@ namespace BottomPanel {
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
             if (ImGui::SmallButton("+ Layer")) {
-                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", MGE::Time{(double)playheadTime}, MGE::Time{1.0}));
+                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", MGE::Time{(double)playheadTime}, MGE::Time{1.5}));
             }
             ImGui::PopStyleVar();
         }
@@ -304,10 +304,10 @@ namespace BottomPanel {
         ImDrawList* leftDraw = ImGui::GetWindowDrawList();
         ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(0, 0));
 
-        for (int i = 0; i < (int)layers.size(); i++) {
+        for (int i = (int)layers.size() - 1, row = 0; i >= 0; i--, row++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
-            ImU32 bgCol = (i % 2 == 0) ? colTrackEven : colTrackOdd;
+            ImU32 bgCol = (row % 2 == 0) ? colTrackEven : colTrackOdd;
             leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), bgCol);
 
             leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), IM_COL32(100, 180, 255, 255));
