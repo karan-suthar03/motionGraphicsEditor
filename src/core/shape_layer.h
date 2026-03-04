@@ -1,12 +1,9 @@
 #pragma once
 
 #include "visual_layer.h"
+#include "color.h"
 
 namespace MGE {
-
-    struct Color {
-        float r = 1.0f, g = 1.0f, b = 1.0f, a = 1.0f;
-    };
 
     class ShapeLayer : public VisualLayer {
     public:

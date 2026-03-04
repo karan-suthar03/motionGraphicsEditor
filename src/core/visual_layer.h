@@ -4,6 +4,7 @@
 #include "transform.h"
 
 namespace MGE {
+    class Renderer;
 
     class VisualLayer : public Layer {
     public:
@@ -16,7 +17,7 @@ namespace MGE {
         Transform&       getTransform()         { return m_transform; }
         void             setTransform(const Transform& t) { m_transform = t; }
 
-        virtual void renderFrame(Time currentTime) = 0;
+        virtual void renderFrame(Time currentTime, Renderer& renderer) = 0;
 
     protected:
         Transform m_transform;

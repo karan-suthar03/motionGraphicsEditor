@@ -25,7 +25,7 @@ namespace AddLayerPopup {
                         ImGui::CloseCurrentPopup();
                     }
                     if (ImGui::Selectable("Circle")) {
-                        scene.addLayer(std::make_unique<MGE::CircleLayer>("Circle", MGE::Time{(double)playheadTime}, MGE::Time{5.0}, 50.0f));
+                        scene.addLayer(std::make_unique<MGE::CircleLayer>("Circle", MGE::Time{(double)playheadTime}, MGE::Time{5.0}));
                         ImGui::CloseCurrentPopup();
                     }
                     if (ImGui::Selectable("Triangle")) {

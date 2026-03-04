@@ -92,4 +92,8 @@ void Project::SetUnitScale(float scale) {
     m_metadata.unitScale = scale;
 }
 
+void Project::SetBackgroundColor(const Color& color) {
+    m_metadata.backgroundColor = color;
+}
+
 } 

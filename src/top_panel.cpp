@@ -1,5 +1,7 @@
 #include "top_panel.h"
 #include "core/project.h"
+#include "core/renderer.h"
+#include <glad/glad.h>
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <string>
@@ -18,6 +20,8 @@ namespace TopPanel {
 
     static float splitX = 350.0f; 
     static const float dividerWidth = 6.0f;
+    static MGE::Renderer g_renderer;
+    static bool g_rendererReady = false;
 
     void Render(float height, MGE::Project& project) {
         
@@ -152,7 +156,8 @@ namespace TopPanel {
         vpDraw->AddRectFilled(vpPos, ImVec2(vpPos.x + vpSize.x, vpPos.y + vpSize.y), IM_COL32(20, 20, 22, 255));
 
         
-        const float aspect = 16.0f / 9.0f;
+        const MGE::ProjectMetadata& meta = project.GetMetadata();
+        const float aspect = (float)meta.resolution.width / (float)meta.resolution.height;
         float canvasW = vpSize.x * 0.85f; 
         float canvasH = canvasW / aspect;
 
@@ -161,24 +166,32 @@ namespace TopPanel {
             canvasW = canvasH * aspect;
         }
 
-        float offsetX = (vpSize.x - canvasW) * 0.5f;
-        float offsetY = (vpSize.y - canvasH) * 0.5f;
-
-        ImVec2 canvasMin(vpPos.x + offsetX, vpPos.y + offsetY);
-        ImVec2 canvasMax(vpPos.x + offsetX + canvasW, vpPos.y + offsetY + canvasH);
-
+        ImVec2 canvasMin(vpPos.x + (vpSize.x - canvasW) * 0.5f, vpPos.y + (vpSize.y - canvasH) * 0.5f);
+        ImVec2 canvasMax(canvasMin.x + canvasW, canvasMin.y + canvasH);
         
-        vpDraw->AddRectFilled(canvasMin, canvasMax, IM_COL32(10, 10, 10, 255));      
-        vpDraw->AddRect(canvasMin, canvasMax, IM_COL32(80, 80, 80, 255), 0.0f, 0, 1.0f); 
-
+        if (!g_rendererReady) {
+            g_renderer.init(meta.resolution.width, meta.resolution.height);
+            g_rendererReady = true;
+        } else if (g_renderer.getWidth()  != meta.resolution.width ||
+                   g_renderer.getHeight() != meta.resolution.height) {
+            g_renderer.resize(meta.resolution.width, meta.resolution.height);
+        }
         
-        ImVec2 center(canvasMin.x + canvasW * 0.5f, canvasMin.y + canvasH * 0.5f);
-        vpDraw->AddLine(ImVec2(center.x - 10, center.y), ImVec2(center.x + 10, center.y), IM_COL32(255, 255, 255, 100), 1.0f);
-        vpDraw->AddLine(ImVec2(center.x, center.y - 10), ImVec2(center.x, center.y + 10), IM_COL32(255, 255, 255, 100), 1.0f);
-
+        MGE::Time currentTime = project.GetTimeline().getCurrentTime();
+        g_renderer.beginFrame(meta.backgroundColor);
+        project.GetScene().renderFrame(currentTime, g_renderer);
+        g_renderer.endFrame();
+        
+        vpDraw->AddRect(canvasMin, canvasMax, IM_COL32(80, 80, 80, 255), 0.0f, 0, 1.0f);
+        ImGui::SetCursorScreenPos(canvasMin);
+        ImGui::Image(
+            (ImTextureID)(uintptr_t)g_renderer.getTexture(),
+            ImVec2(canvasW, canvasH),
+            ImVec2(0, 1), ImVec2(1, 0)  
+        );
         
         char zoomTxt[32];
-        snprintf(zoomTxt, sizeof(zoomTxt), "Fit (%d%%)", (int)((canvasW / 1920.0f) * 100.0f));
+        snprintf(zoomTxt, sizeof(zoomTxt), "Fit (%d%%)", (int)((canvasW / (float)meta.resolution.width) * 100.0f));
         vpDraw->AddText(ImVec2(canvasMin.x + 5, canvasMax.y - 18), IM_COL32(150, 150, 150, 255), zoomTxt);
 
         ImGui::EndChild(); 

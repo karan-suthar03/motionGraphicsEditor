@@ -1,6 +1,7 @@
 #pragma once
 
 #include "shape_layer.h"
+#include "renderer.h"
 
 namespace MGE {
 
@@ -12,14 +13,13 @@ namespace MGE {
                 m_transform.scaleY = 50.0f; // Default radius
             }
 
-        void renderFrame(Time currentTime) override {
+        void renderFrame(Time currentTime, Renderer& renderer) override {
             if (!m_visible) return;
             if (currentTime < m_startTime || currentTime > m_startTime + m_duration) return;
 
-            // TODO: draw unit circle at (m_transform.x, m_transform.y)
-            //       scaled by (m_transform.scaleX, m_transform.scaleY),
-            //       rotated by m_transform.rotation, filled with m_fillColor
+            renderer.drawCircle(m_transform, m_fillColor);
         }
     };
 
 }
+

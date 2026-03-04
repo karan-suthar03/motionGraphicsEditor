@@ -4,7 +4,7 @@ project(MotionGraphicsEditor)
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-include_directories(lib/imgui lib/glfw/include)
+include_directories(lib/imgui lib/glfw/include lib/glad/include)
 
 set(IMGUI_SOURCES
     lib/imgui/imgui.cpp
@@ -22,6 +22,9 @@ set(APP_SOURCES
     src/bottom_panel.cpp
     src/core/project.cpp
     src/core/timeline.cpp
+    src/core/renderer.cpp
+    src/core/shape_renderer.cpp
+    lib/glad/src/glad.c
 )
 
 add_executable(MotionGraphicsEditor ${APP_SOURCES} ${IMGUI_SOURCES})

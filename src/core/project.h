@@ -2,6 +2,7 @@
 
 #include "timeline.h"
 #include "scene.h"
+#include "color.h"
 #include <string>
 
 namespace MGE {
@@ -19,9 +20,10 @@ enum class ColorSpace {
 
 
 struct ProjectMetadata {
-    Resolution  resolution  = { 1920, 1080 };
-    ColorSpace  colorSpace  = ColorSpace::sRGB;
-    float       unitScale   = 1.0f;    
+    Resolution  resolution       = { 1920, 1080 };
+    ColorSpace  colorSpace       = ColorSpace::sRGB;
+    float       unitScale        = 1.0f;
+    Color       backgroundColor  = { 0.0f, 0.0f, 0.0f, 1.0f };
 };
 
 class Project {
@@ -61,6 +63,7 @@ public:
     void SetResolution(int width, int height);
     void SetColorSpace(ColorSpace cs);
     void SetUnitScale(float scale);
+    void SetBackgroundColor(const Color& color);
 
     
     Timeline&       GetTimeline()       { return m_timeline; }
