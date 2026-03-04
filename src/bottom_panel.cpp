@@ -1,6 +1,6 @@
 #include "bottom_panel.h"
-#include "project.h"
-#include "layer.h"
+#include "core/project.h"
+#include "core/layer.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <cmath>

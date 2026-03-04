@@ -1,5 +1,5 @@
 #include "top_panel.h"
-#include "project.h"
+#include "core/project.h"
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <string>

@@ -1,7 +1,7 @@
 #include "app_window.h"
 #include "top_panel.h"
 #include "bottom_panel.h"
-#include "project.h"
+#include "core/project.h"
 
 #include "imgui.h"
 #include "imgui_impl_glfw.h"
