@@ -56,10 +56,9 @@ void ShapeRenderer::init(int width, int height) {
     buildShaders();
 }
 
-void ShapeRenderer::resize(int width, int height) {
-    m_width  = width;
-    m_height = height;
-    
+void ShapeRenderer::setProjectionSize(int projW, int projH) {
+    m_width  = projW;
+    m_height = projH;
 }
 
 void ShapeRenderer::drawCircle(const Transform& t, const Color& fill) {

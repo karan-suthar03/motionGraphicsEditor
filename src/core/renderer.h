@@ -14,13 +14,16 @@ namespace MGE {
 
         void init(int width, int height);
         void resize(int width, int height);
+        void setProjectionSize(int projW, int projH);
 
         void beginFrame(const Color& background);
         void endFrame();
 
-        uint32_t getTexture() const { return m_colorTex; }
-        int      getWidth()   const { return m_width;    }
-        int      getHeight()  const { return m_height;   }
+        uint32_t getTexture()    const { return m_colorTex; }
+        int      getWidth()      const { return m_width;    }
+        int      getHeight()     const { return m_height;   }
+        int      getProjWidth()  const { return m_projWidth;  }
+        int      getProjHeight() const { return m_projHeight; }
 
         ShapeRenderer& shapes() { return m_shapes; }
 
@@ -32,8 +35,14 @@ namespace MGE {
 
         uint32_t m_fbo      = 0;
         uint32_t m_colorTex = 0;
-        int      m_width    = 1920;
-        int      m_height   = 1080;
+        uint32_t m_msaaFbo  = 0;
+        uint32_t m_msaaRbo  = 0;
+        static constexpr int k_msaaSamples = 4;
+
+        int      m_width    = 1;
+        int      m_height   = 1;
+        int      m_projWidth  = 1920;
+        int      m_projHeight = 1080;
 
         ShapeRenderer m_shapes;
     };

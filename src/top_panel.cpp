@@ -9,6 +9,7 @@
 #include "imgui_internal.h"
 #include <string>
 #include <cstring>
+#include <algorithm>
 
 namespace TopPanel {
 
@@ -225,14 +226,15 @@ namespace TopPanel {
 
         ImVec2 canvasMin(vpPos.x + (vpSize.x - canvasW) * 0.5f, vpPos.y + (vpSize.y - canvasH) * 0.5f);
         ImVec2 canvasMax(canvasMin.x + canvasW, canvasMin.y + canvasH);
-        
+        const int previewW = std::max(1, (int)canvasW);
+        const int previewH = std::max(1, (int)canvasH);
         if (!g_rendererReady) {
-            g_renderer.init(meta.resolution.width, meta.resolution.height);
+            g_renderer.init(previewW, previewH);
             g_rendererReady = true;
-        } else if (g_renderer.getWidth()  != meta.resolution.width ||
-                   g_renderer.getHeight() != meta.resolution.height) {
-            g_renderer.resize(meta.resolution.width, meta.resolution.height);
+        } else if (g_renderer.getWidth() != previewW || g_renderer.getHeight() != previewH) {
+            g_renderer.resize(previewW, previewH);
         }
+        g_renderer.setProjectionSize(meta.resolution.width, meta.resolution.height);
         
         MGE::Time currentTime = project.GetTimeline().getCurrentTime();
         g_renderer.beginFrame(meta.backgroundColor);

@@ -12,7 +12,7 @@ namespace MGE {
         ~ShapeRenderer();
 
         void init(int width, int height);
-        void resize(int width, int height);
+        void setProjectionSize(int projW, int projH);
 
         void drawCircle(const Transform& t, const Color& fill);
 
