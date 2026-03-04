@@ -87,14 +87,14 @@ static void RenderProjectSettingsModal(MGE::Project& project) {
         tl.setFPS((double)fpsF);
 
     
-    float startF = (float)tl.getStartTime();
-    float endF   = (float)tl.getEndTime();
+    float startF = (float)tl.getStartTime().seconds;
+    float endF   = (float)tl.getEndTime().seconds;
     ImGui::SetNextItemWidth(120);
-    if (ImGui::DragFloat("Start (s)", &startF, 0.1f, 0.0f, (float)(tl.getEndTime() - 0.1)))
-        tl.setStartTime((double)startF);
+    if (ImGui::DragFloat("Start (s)", &startF, 0.1f, 0.0f, (float)(tl.getEndTime().seconds - 0.1)))
+        tl.setStartTime(MGE::Time{(double)startF});
     ImGui::SetNextItemWidth(120);
-    if (ImGui::DragFloat("End (s)",   &endF,   0.1f, (float)(tl.getStartTime() + 0.1), 3600.0f))
-        tl.setEndTime((double)endF);
+    if (ImGui::DragFloat("End (s)",   &endF,   0.1f, (float)(tl.getStartTime().seconds + 0.1), 3600.0f))
+        tl.setEndTime(MGE::Time{(double)endF});
 
     ImGui::Spacing();
     ImGui::Separator();

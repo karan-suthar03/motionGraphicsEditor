@@ -1,5 +1,7 @@
 #pragma once
 
+#include "time.h"
+
 namespace MGE {
 
 enum class PlaybackState {
@@ -14,14 +16,14 @@ public:
     Timeline();
 
     
-    double        getCurrentTime()   const { return m_currentTime; }
-    double        getStartTime()     const { return m_startTime; }
-    double        getEndTime()       const { return m_endTime; }
+    Time          getCurrentTime()   const { return m_currentTime; }
+    Time          getStartTime()     const { return m_startTime; }
+    Time          getEndTime()       const { return m_endTime; }
     double        getFPS()           const { return m_fps; }
     PlaybackState getPlaybackState() const { return m_playbackState; }
 
     
-    double getDuration()         const { return m_endTime - m_startTime; }
+    Time   getDuration()         const { return Time{m_endTime.seconds - m_startTime.seconds}; }
     int    getTotalFrames()      const;
     int    getCurrentFrame()     const;
 
@@ -30,10 +32,10 @@ public:
     bool isPaused()    const { return m_playbackState == PlaybackState::Paused;    }
     bool isScrubbing() const { return m_playbackState == PlaybackState::Scrubbing; }
     
-    void setCurrentTime(double t);
+    void setCurrentTime(Time t);
     
-    void setStartTime(double t);
-    void setEndTime(double t);
+    void setStartTime(Time t);
+    void setEndTime(Time t);
     
     void setFPS(double fps);
     
@@ -41,14 +43,14 @@ public:
     
     void pause();
     
-    void scrub(double t);
+    void scrub(Time t);
     
     void stopScrubbing();
 
 private:
-    double        m_currentTime;
-    double        m_startTime;
-    double        m_endTime;
+    Time          m_currentTime;
+    Time          m_startTime;
+    Time          m_endTime;
     double        m_fps;
     PlaybackState m_playbackState;
 };

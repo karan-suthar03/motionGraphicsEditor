@@ -28,9 +28,9 @@ namespace BottomPanel {
         MGE::Scene&    scene    = project.GetScene();
 
         
-        projectDuration = (float)timeline.getDuration();
+        projectDuration = (float)timeline.getDuration().seconds;
         if (projectDuration < 1.0f) projectDuration = 1.0f;
-        float playheadTime = (float)timeline.getCurrentTime();
+        float playheadTime = (float)timeline.getCurrentTime().seconds;
 
         
         if (visibleEnd > projectDuration) visibleEnd = projectDuration;
@@ -127,8 +127,8 @@ namespace BottomPanel {
             rightDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + rightWidth, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
 
             
-            float clipStart = (float)layers[i]->getStartTime();
-            float clipEnd   = (float)(layers[i]->getStartTime() + layers[i]->getDuration());
+            float clipStart = (float)layers[i]->getStartTime().seconds;
+            float clipEnd   = (float)(layers[i]->getStartTime().seconds + layers[i]->getDuration().seconds);
 
             float x0 = cursorP.x + ((clipStart - visibleStart) / duration) * rightWidth;
             float x1 = cursorP.x + ((clipEnd - visibleStart) / duration) * rightWidth;
@@ -290,7 +290,7 @@ namespace BottomPanel {
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
             if (ImGui::SmallButton("+ Layer")) {
-                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", (double)playheadTime, 1.0));
+                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", MGE::Time{(double)playheadTime}, MGE::Time{1.0}));
             }
             ImGui::PopStyleVar();
         }
@@ -370,7 +370,7 @@ namespace BottomPanel {
                 if (newTime > projectDuration) newTime = projectDuration;
                 playheadTime = newTime;
                 
-                timeline.scrub(newTime);
+                timeline.scrub(MGE::Time{newTime});
                 phX = rightPaneScreenPos.x + ((playheadTime - visibleStart) / duration) * rightWidth;
                 ImGui::SetMouseCursor(ImGuiMouseCursor_ResizeEW);
             } else {

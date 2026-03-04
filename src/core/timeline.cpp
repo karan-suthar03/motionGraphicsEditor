@@ -9,9 +9,9 @@ namespace MGE {
 
 
 Timeline::Timeline()
-    : m_currentTime(0.0)
-    , m_startTime(0.0)
-    , m_endTime(10.0)
+    : m_currentTime{0.0}
+    , m_startTime{0.0}
+    , m_endTime{10.0}
     , m_fps(60.0)
     , m_playbackState(PlaybackState::Paused)
 {}
@@ -20,37 +20,37 @@ Timeline::Timeline()
 
 
 int Timeline::getTotalFrames() const {
-    return static_cast<int>(std::floor(getDuration() * m_fps));
+    return getDuration().ToFrame(m_fps);
 }
 
 int Timeline::getCurrentFrame() const {
-    return static_cast<int>(std::floor(m_currentTime * m_fps));
+    return m_currentTime.ToFrame(m_fps);
 }
 
 
 
 
-void Timeline::setCurrentTime(double t) {
-    if (t < m_startTime) t = m_startTime;
-    if (t > m_endTime)   t = m_endTime;
+void Timeline::setCurrentTime(Time t) {
+    if (t.seconds < m_startTime.seconds) t = m_startTime;
+    if (t.seconds > m_endTime.seconds)   t = m_endTime;
     m_currentTime = t;
 }
 
-void Timeline::setStartTime(double t) {
-    if (t >= m_endTime)
+void Timeline::setStartTime(Time t) {
+    if (t.seconds >= m_endTime.seconds)
         throw std::invalid_argument("Timeline: start time must be less than end time.");
     m_startTime = t;
     
-    if (m_currentTime < m_startTime)
+    if (m_currentTime.seconds < m_startTime.seconds)
         m_currentTime = m_startTime;
 }
 
-void Timeline::setEndTime(double t) {
-    if (t <= m_startTime)
+void Timeline::setEndTime(Time t) {
+    if (t.seconds <= m_startTime.seconds)
         throw std::invalid_argument("Timeline: end time must be greater than start time.");
     m_endTime = t;
     
-    if (m_currentTime > m_endTime)
+    if (m_currentTime.seconds > m_endTime.seconds)
         m_currentTime = m_endTime;
 }
 
@@ -71,7 +71,7 @@ void Timeline::pause() {
     m_playbackState = PlaybackState::Paused;
 }
 
-void Timeline::scrub(double t) {
+void Timeline::scrub(Time t) {
     m_playbackState = PlaybackState::Scrubbing;
     setCurrentTime(t);
 }
