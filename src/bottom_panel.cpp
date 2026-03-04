@@ -5,6 +5,7 @@
 #include "imgui_internal.h"
 #include <cmath>
 #include <memory>
+#include "add_layer_popup.h"
 
 namespace BottomPanel {
     static float splitX = 250.0f;
@@ -290,8 +291,11 @@ namespace BottomPanel {
             ImGui::SetCursorScreenPos(ImVec2(leftHeaderPos.x + splitX - btnW - 6, leftHeaderPos.y + 4));
             ImGui::PushStyleVar(ImGuiStyleVar_FramePadding, ImVec2(4, 2));
             if (ImGui::SmallButton("+ Layer")) {
-                scene.addLayer(std::make_unique<MGE::Layer>("Shape layer", MGE::Time{(double)playheadTime}, MGE::Time{1.5}));
+				ImGui::OpenPopup("AddLayerMenuPopup");
             }
+
+            AddLayerPopup::Render(scene, playheadTime);
+
             ImGui::PopStyleVar();
         }
         ImGui::EndChild(); 
