@@ -11,9 +11,6 @@ namespace MGE {
 
         float scaleX = 1.0f;
         float scaleY = 1.0f;
-
-        float anchorX = 0.0f;
-        float anchorY = 0.0f;
     };
 
 }

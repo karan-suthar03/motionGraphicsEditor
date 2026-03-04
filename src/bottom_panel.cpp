@@ -293,14 +293,22 @@ namespace BottomPanel {
         for (int i = (int)layers.size() - 1, row = 0; i >= 0; i--, row++) {
             ImVec2 cursorP = ImGui::GetCursorScreenPos();
 
-            ImU32 bgCol = (row % 2 == 0) ? colTrackEven : colTrackOdd;
+            bool isSelected = (project.GetSelectedLayerIndex() == i);
+            ImU32 bgCol = isSelected ? IM_COL32(50, 80, 120, 255)
+                        : (row % 2 == 0) ? colTrackEven : colTrackOdd;
             leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), bgCol);
 
-            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), IM_COL32(100, 180, 255, 255));
+            ImU32 accentCol = isSelected ? IM_COL32(80, 160, 255, 255) : IM_COL32(100, 180, 255, 255);
+            leftDraw->AddRectFilled(cursorP, ImVec2(cursorP.x + 4, cursorP.y + rowHeight), accentCol);
             leftDraw->AddLine(ImVec2(cursorP.x, cursorP.y + rowHeight), ImVec2(cursorP.x + splitX, cursorP.y + rowHeight), IM_COL32(20, 20, 20, 255));
             leftDraw->AddText(ImVec2(cursorP.x + 15, cursorP.y + (rowHeight - ImGui::GetTextLineHeight()) * 0.5f), IM_COL32(220, 220, 220, 255), layers[i]->getName().c_str());
 
-            ImGui::Dummy(ImVec2(0.0f, rowHeight));
+            char btnId[32];
+            snprintf(btnId, sizeof(btnId), "##layer_sel_%d", i);
+            ImGui::InvisibleButton(btnId, ImVec2(splitX, rowHeight));
+            if (ImGui::IsItemClicked()) {
+                project.SetSelectedLayerIndex(i);
+            }
         }
 
         ImGui::PopStyleVar();

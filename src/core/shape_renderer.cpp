@@ -76,10 +76,9 @@ void ShapeRenderer::drawCircle(const Transform& t, const Color& fill) {
     
     const float rad = t.rotation * (float)(M_PI / 180.0);
     const float c = cosf(rad), s = sinf(rad);
-    const float sx = t.scaleX,  sy = t.scaleY;
-    const float ax = t.anchorX, ay = t.anchorY;
-    const float tx = t.x - ax * c * sx + ay * s * sy;
-    const float ty = t.y - ax * s * sx - ay * c * sy;
+    const float sx = t.scaleX, sy = t.scaleY;
+    const float tx = t.x;
+    const float ty = t.y;
 
     float model[16] = {
         c * sx, s * sx, 0, 0,

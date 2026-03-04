@@ -72,6 +72,9 @@ public:
     Scene&          GetScene()          { return m_scene; }
     const Scene&    GetScene()    const { return m_scene; }
 
+    int  GetSelectedLayerIndex() const            { return m_selectedLayerIndex; }
+    void SetSelectedLayerIndex(int idx)           { m_selectedLayerIndex = idx; }
+
 private:
     std::string     m_id;
     std::string     m_name;
@@ -79,6 +82,7 @@ private:
     ProjectMetadata m_metadata;
     Timeline        m_timeline;
     Scene           m_scene;
+    int             m_selectedLayerIndex = -1;
 
     
     static std::string GenerateID();

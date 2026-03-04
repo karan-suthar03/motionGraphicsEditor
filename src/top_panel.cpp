@@ -1,10 +1,14 @@
 #include "top_panel.h"
 #include "core/project.h"
 #include "core/renderer.h"
+#include "core/visual_layer.h"
+#include "core/shape_layer.h"
+#include "core/circle_layer.h"
 #include <glad/glad.h>
 #include "imgui.h"
 #include "imgui_internal.h"
 #include <string>
+#include <cstring>
 
 namespace TopPanel {
 
@@ -65,34 +69,87 @@ namespace TopPanel {
         
         ImGui::BeginChild("TopLeftBody", ImVec2(splitX, panelSize.y - headerHeight), false);
 
+        MGE::Layer* selLayer = nullptr;
+        int selIdx = project.GetSelectedLayerIndex();
+        const auto& sceneLayers = project.GetScene().getLayers();
+        if (selIdx >= 0 && selIdx < (int)sceneLayers.size())
+            selLayer = sceneLayers[selIdx].get();
+
         
         ImGui::SetCursorPos(ImVec2(ImGui::GetCursorPosX() + 8, ImGui::GetCursorPosY() + 8));
-        ImGui::PushItemWidth(splitX - 100.0f); 
+        ImGui::PushItemWidth(splitX - 110.0f); 
 
-        
-        if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
-            static float pos[2] = { 960.0f, 540.0f };
-            static float scale = 100.0f;
-            static float rotation = 0.0f;
-            static float opacity = 100.0f;
+        if (!selLayer) {
+            ImGui::Spacing();
+            ImGui::Spacing();
+            ImGui::TextDisabled("No layer selected");
+            ImGui::Spacing();
+            ImGui::TextDisabled("Click a layer in the timeline");
+            ImGui::TextDisabled("to inspect its properties.");
+        } else {
+            char nameBuf[128];
+            strncpy_s(nameBuf, sizeof(nameBuf), selLayer->getName().c_str(), _TRUNCATE);
+            if (ImGui::InputText("Name", nameBuf, sizeof(nameBuf)))
+                selLayer->setName(nameBuf);
+
+            bool visible = selLayer->isVisible();
+            if (ImGui::Checkbox("Visible", &visible))
+                selLayer->setVisible(visible);
 
             ImGui::Spacing();
-            ImGui::DragFloat2("Position", pos, 1.0f);
-            ImGui::DragFloat("Scale", &scale, 0.5f, 0.0f, 1000.0f, "%.1f %%");
-            ImGui::DragFloat("Rotation", &rotation, 0.5f, -360.0f, 360.0f, "%.1f deg");
-            ImGui::DragFloat("Opacity", &opacity, 0.5f, 0.0f, 100.0f, "%.1f %%");
+            ImGui::Separator();
             ImGui::Spacing();
-        }
 
-        if (ImGui::CollapsingHeader("Effects", ImGuiTreeNodeFlags_DefaultOpen)) {
-            static bool enableBlur = false;
-            static float blurAmount = 10.0f;
+            if (auto* vl = dynamic_cast<MGE::VisualLayer*>(selLayer)) {
+                auto& tf = vl->getTransform();
 
-            ImGui::Spacing();
-            ImGui::Checkbox("Gaussian Blur", &enableBlur);
-            if (!enableBlur) ImGui::BeginDisabled();
-            ImGui::DragFloat("Bluriness", &blurAmount, 0.2f, 0.0f, 100.0f);
-            if (!enableBlur) ImGui::EndDisabled();
+                if (ImGui::CollapsingHeader("Transform", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    ImGui::Spacing();
+                    float pos[2] = { tf.x, tf.y };
+                    if (ImGui::DragFloat2("Position", pos, 1.0f)) { tf.x = pos[0]; tf.y = pos[1]; }
+                    float scaleXPct = tf.scaleX * 100.0f;
+                    float scaleYPct = tf.scaleY * 100.0f;
+                    if (ImGui::DragFloat("Scale X", &scaleXPct, 0.5f, 0.0f, 1000.0f, "%.1f %%")) tf.scaleX = scaleXPct / 100.0f;
+                    if (ImGui::DragFloat("Scale Y", &scaleYPct, 0.5f, 0.0f, 1000.0f, "%.1f %%")) tf.scaleY = scaleYPct / 100.0f;
+                    ImGui::DragFloat("Rotation", &tf.rotation, 0.5f, -360.0f, 360.0f, "%.1f deg");
+                    float opacity = vl->getOpacity() * 100.0f;
+                    if (ImGui::DragFloat("Opacity", &opacity, 0.5f, 0.0f, 100.0f, "%.1f %%"))
+                        vl->setOpacity(opacity / 100.0f);
+                    ImGui::Spacing();
+                }
+
+                if (auto* sl = dynamic_cast<MGE::ShapeLayer*>(selLayer)) {
+                    if (ImGui::CollapsingHeader("Shape", ImGuiTreeNodeFlags_DefaultOpen)) {
+                        ImGui::Spacing();
+                        if (auto* cl = dynamic_cast<MGE::CircleLayer*>(sl)) {
+                            float radius = cl->getRadius();
+                            if (ImGui::DragFloat("Radius", &radius, 0.5f, 1.0f, 4000.0f, "%.1f px"))
+                                cl->setRadius(radius);
+                        }
+                        MGE::Color fc = sl->getFillColor();
+                        float col[4] = { fc.r, fc.g, fc.b, fc.a };
+                        if (ImGui::ColorEdit4("Fill Color", col))
+                            sl->setFillColor({ col[0], col[1], col[2], col[3] });
+                        ImGui::Spacing();
+                    }
+                }
+
+                if (ImGui::CollapsingHeader("Effects", ImGuiTreeNodeFlags_DefaultOpen)) {
+                    static bool enableBlur = false;
+                    static float blurAmount = 10.0f;
+
+                    ImGui::Spacing();
+                    ImGui::Checkbox("Gaussian Blur", &enableBlur);
+                    if (!enableBlur) ImGui::BeginDisabled();
+                    ImGui::DragFloat("Blurriness", &blurAmount, 0.2f, 0.0f, 100.0f);
+                    if (!enableBlur) ImGui::EndDisabled();
+                    ImGui::Spacing();
+                }
+            } else {
+                ImGui::Spacing();
+                ImGui::TextDisabled("(Audio layer)");
+                ImGui::TextDisabled("No visual properties.");
+            }
         }
 
         ImGui::PopItemWidth();
